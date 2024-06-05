@@ -1,9 +1,9 @@
 import asyncHandler from '../middleware/asyncHandler.js';
 import Product from '../models/productModel.js';
 
-// @desc    Fetch all products
+// @desc    Obtener todos los productos
 // @route   GET /api/products
-// @access  Public
+// @access  Público
 const getProducts = asyncHandler(async (req, res) => {
   const pageSize = process.env.PAGINATION_LIMIT;
   const page = Number(req.query.pageNumber) || 1;
@@ -25,47 +25,47 @@ const getProducts = asyncHandler(async (req, res) => {
   res.json({ products, page, pages: Math.ceil(count / pageSize) });
 });
 
-// @desc    Fetch single product
+// @desc    Obtener un producto por ID
 // @route   GET /api/products/:id
-// @access  Public
+// @access  Público
 const getProductById = asyncHandler(async (req, res) => {
-  // NOTE: checking for valid ObjectId to prevent CastError moved to separate
-  // middleware. See README for more info.
+  // NOTA: la verificación de ObjectId válido para prevenir CastError se movió a un middleware separado.
+  // Ver el README para más información.
 
   const product = await Product.findById(req.params.id);
   if (product) {
     return res.json(product);
   } else {
-    // NOTE: this will run if a valid ObjectId but no product was found
-    // i.e. product may be null
+    // NOTA: esto se ejecutará si hay un ObjectId válido pero no se encontró el producto
+    // es decir, el producto puede ser nulo
     res.status(404);
-    throw new Error('Product not found');
+    throw new Error('Producto no encontrado');
   }
 });
 
-// @desc    Create a product
+// @desc    Crear un producto
 // @route   POST /api/products
-// @access  Private/Admin
+// @access  Privado/Admin
 const createProduct = asyncHandler(async (req, res) => {
   const product = new Product({
-    name: 'Sample name',
+    name: 'Nombre de ejemplo',
     price: 0,
     user: req.user._id,
     image: '/images/sample.jpg',
-    brand: 'Sample brand',
-    category: 'Sample category',
+    brand: 'Marca de ejemplo',
+    category: 'Categoría de ejemplo',
     countInStock: 0,
     numReviews: 0,
-    description: 'Sample description',
+    description: 'Descripción de ejemplo',
   });
 
   const createdProduct = await product.save();
   res.status(201).json(createdProduct);
 });
 
-// @desc    Update a product
+// @desc    Actualizar un producto
 // @route   PUT /api/products/:id
-// @access  Private/Admin
+// @access  Privado/Admin
 const updateProduct = asyncHandler(async (req, res) => {
   const { name, price, description, image, brand, category, countInStock } =
     req.body;
@@ -85,28 +85,28 @@ const updateProduct = asyncHandler(async (req, res) => {
     res.json(updatedProduct);
   } else {
     res.status(404);
-    throw new Error('Product not found');
+    throw new Error('Producto no encontrado');
   }
 });
 
-// @desc    Delete a product
+// @desc    Eliminar un producto
 // @route   DELETE /api/products/:id
-// @access  Private/Admin
+// @access  Privado/Admin
 const deleteProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
 
   if (product) {
     await Product.deleteOne({ _id: product._id });
-    res.json({ message: 'Product removed' });
+    res.json({ message: 'Producto eliminado' });
   } else {
     res.status(404);
-    throw new Error('Product not found');
+    throw new Error('Producto no encontrado');
   }
 });
 
-// @desc    Create new review
+// @desc    Crear una nueva reseña
 // @route   POST /api/products/:id/reviews
-// @access  Private
+// @access  Privado
 const createProductReview = asyncHandler(async (req, res) => {
   const { rating, comment } = req.body;
 
@@ -119,7 +119,7 @@ const createProductReview = asyncHandler(async (req, res) => {
 
     if (alreadyReviewed) {
       res.status(400);
-      throw new Error('Product already reviewed');
+      throw new Error('Producto ya reseñado');
     }
 
     const review = {
@@ -138,16 +138,16 @@ const createProductReview = asyncHandler(async (req, res) => {
       product.reviews.length;
 
     await product.save();
-    res.status(201).json({ message: 'Review added' });
+    res.status(201).json({ message: 'Reseña agregada' });
   } else {
     res.status(404);
-    throw new Error('Product not found');
+    throw new Error('Producto no encontrado');
   }
 });
 
-// @desc    Get top rated products
+// @desc    Obtener los productos mejor valorados
 // @route   GET /api/products/top
-// @access  Public
+// @access  Público
 const getTopProducts = asyncHandler(async (req, res) => {
   const products = await Product.find({}).sort({ rating: -1 }).limit(3);
 
